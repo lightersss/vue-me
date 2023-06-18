@@ -6,6 +6,7 @@ let activeEffect: null | (() => any) = null;
  * * 在cleanUp某个副作用函数时，找到这个副作用函数对应的 Set 就可以从这个Set中删除这个副作用函数
  */
 const effectsDeps: Map<() => any, Set<() => any>[]> = new Map();
+const activeEffectStack: (() => any)[] = [];
 
 type ObjectKeyType = string | Symbol | number;
 
@@ -36,7 +37,16 @@ export const trigger = (data: Object, key: ObjectKeyType) => {
   if (!keyToEffects) return;
   let effects = keyToEffects.get(key);
   if (!effects) return;
-  [...effects].forEach((effect) => effect());
+  [...effects].forEach((effect) => {
+    /**
+     * ! 当在effect中对同一个变量进行 读取和设置时，会进行无限递归
+     * ! `obj.a = obj.a + 1`
+     * ! 访问obj.a时会进入track函数，为obj.a增加当前的 副作用函数
+     * ! 赋值时会进入 trigger函数，触发刚刚添加的副作用函数 此时会重新执行 `obj.a = obj.a + 1` 再次触发 track和trigger
+     */
+    if (effect === activeEffect) return;
+    effect();
+  });
 };
 /**
  *
@@ -66,7 +76,10 @@ export const effect = <T>(fn: () => T) => {
   function effectFn() {
     cleanUpEffect(effectFn);
     activeEffect = effectFn;
+    activeEffectStack.push(effectFn);
     fn();
+    activeEffectStack.pop();
+    activeEffect = activeEffectStack[activeEffectStack.length - 1];
   }
   effectsDeps.set(effectFn, []);
   effectFn();
