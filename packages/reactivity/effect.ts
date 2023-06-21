@@ -15,6 +15,13 @@ type ObjectKeyType = string | Symbol | number;
  */
 const dataToEffects = new WeakMap<Object, Map<ObjectKeyType, Set<() => any>>>();
 
+/**
+ *
+ * @param data 响应式数据
+ * @param key 响应式数据的key
+ * @returns void
+ * @description 为响应式数据增加变化时的回调
+ */
 export const track = (data: Object, key: string | Symbol | number) => {
   if (!activeEffect) return;
   let keyToEffects = dataToEffects.get(data);
@@ -31,7 +38,13 @@ export const track = (data: Object, key: string | Symbol | number) => {
   const originEffects = effectsDeps.get(activeEffect) ?? [];
   effectsDeps.set(activeEffect, [...originEffects, effects]);
 };
-
+/**
+ *
+ * @param data 响应式数据
+ * @param key 响应式数据的key
+ * @returns void
+ * @description 触发响应式数据上的回调函数
+ */
 export const trigger = (data: Object, key: ObjectKeyType) => {
   let keyToEffects = dataToEffects.get(data);
   if (!keyToEffects) return;
@@ -68,7 +81,10 @@ const cleanUpEffect = (effectFn: () => any) => {
   effectsToDelete.forEach((effectsSet) => effectsSet.delete(effectFn));
 };
 
-export const effect = <T>(fn: () => T) => {
+type EffectOptions = {
+  scheduler?: (fn: () => any) => void;
+};
+export const effect = <T>(fn: () => T, options?: EffectOptions) => {
   /**
    * @description effect 只会执行一次，所以 effectsDeps.set 只执行一次，不会产生引用变化
    * 而 effectFn 作为响应式数据发生变化时的回调 ，会调用多次
@@ -82,5 +98,10 @@ export const effect = <T>(fn: () => T) => {
     activeEffect = activeEffectStack[activeEffectStack.length - 1];
   }
   effectsDeps.set(effectFn, []);
+  if (options?.scheduler) {
+    //todo:为什么书里要放在trigger函数里执行 ？ vue源码也是这么做的？
+    options.scheduler(effectFn);
+    return;
+  }
   effectFn();
 };
