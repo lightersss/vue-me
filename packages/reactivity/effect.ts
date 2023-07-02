@@ -1,3 +1,5 @@
+import { TRACK_KEYS } from "./reactive";
+
 let activeEffect: null | EffectFn = null;
 /**
  * * 此变量与cleanUp函数结合使用
@@ -8,7 +10,13 @@ let activeEffect: null | EffectFn = null;
 // const effectsDeps: Map<() => any, Set<() => any>[]> = new Map();
 const activeEffectStack: EffectFn[] = [];
 
-type ObjectKeyType = string | Symbol | number;
+type ObjectKeyType = string | Symbol;
+
+export enum TRIGGER_TYPE {
+  ADD_KEY = "ADD_KEY",
+  SET_KEY = "SET_KEY",
+  DELETE_KEY = "DELETE_KEY",
+}
 
 /**
  * @description key为原始对象,value为对象的键和effect之间的关系
@@ -22,7 +30,7 @@ const dataToEffects = new WeakMap<Object, Map<ObjectKeyType, Set<EffectFn>>>();
  * @returns void
  * @description 为响应式数据增加变化时的回调
  */
-export const track = (data: Object, key: string | Symbol | number) => {
+export const track = (data: Object, key: ObjectKeyType) => {
   if (!activeEffect) return;
   let keyToEffects = dataToEffects.get(data);
   if (!keyToEffects) {
@@ -45,12 +53,23 @@ export const track = (data: Object, key: string | Symbol | number) => {
  * @returns void
  * @description 触发响应式数据上的回调函数
  */
-export const trigger = <T extends Object>(data: T, key: keyof T) => {
+export const trigger = <T extends Object>(
+  data: T,
+  key: ObjectKeyType,
+  type: TRIGGER_TYPE
+) => {
   let keyToEffects = dataToEffects.get(data);
   if (!keyToEffects) return;
   let effects = keyToEffects.get(key);
   if (!effects) return;
-  [...effects].forEach((effect) => {
+  let effectsToRun = new Set(effects);
+  if (type === TRIGGER_TYPE.ADD_KEY || type === TRIGGER_TYPE.DELETE_KEY) {
+    const iterateKeyEffects = keyToEffects.get(TRACK_KEYS.ITERATE_KEY) ?? [];
+    iterateKeyEffects.forEach((effect) => {
+      effectsToRun.add(effect);
+    });
+  }
+  [...effectsToRun].forEach((effect) => {
     /**
      * ! 当在effect中对同一个变量进行 读取和设置时，会进行无限递归
      * ! `obj.a = obj.a + 1`

@@ -1,4 +1,9 @@
 import { effect } from "./effect";
-import { reactive } from "./reactive";
+import {
+  reactive,
+  shallowReactive,
+  readOnly,
+  shallowReadOnly,
+} from "./reactive";
 
-export { effect, reactive };
+export { effect, reactive, shallowReactive, readOnly, shallowReadOnly };
