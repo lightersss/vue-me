@@ -1,0 +1,11 @@
+{
+  "mode": "pre",
+  "tag": "basic",
+  "initialVersions": {
+    "reactivity": "1.0.1",
+    "render": "1.0.1"
+  },
+  "changesets": [
+    "few-falcons-refuse"
+  ]
+}
