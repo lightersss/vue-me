@@ -8,12 +8,12 @@ type reactiveOptions = {
   isShallow?: boolean;
   isReadOnly?: boolean;
 };
-export const createReactive = <T extends object>(
-  data: T,
+export const createReactive = (
+  data: object,
   options?: reactiveOptions
-) => {
+): any => {
   const { isShallow = false, isReadOnly = false } = options ?? {};
-  const res = new Proxy(data, {
+  return new Proxy(data, {
     get(target, prop, receiver) {
       /**
        * raw用于记录这个proxy代理的原始对象
@@ -27,11 +27,11 @@ export const createReactive = <T extends object>(
       if (!isReadOnly) {
         track(target, prop);
       }
-      const res = Reflect.get(target, prop, receiver);
-      if (isObject(res) && !isShallow) {
-        return createReactive(res, options);
+      const _res = Reflect.get(target, prop, receiver);
+      if (isObject(_res) && !isShallow) {
+        return createReactive(_res, options);
       }
-      return res;
+      return _res;
     },
     set(target, prop, value, receiver) {
       if (isReadOnly) {
@@ -39,13 +39,13 @@ export const createReactive = <T extends object>(
         return true;
       }
       const isShouldTigger = shouldTigger(target, prop, value, receiver);
-      const res = Reflect.set(target, prop, value, receiver);
+      const _res = Reflect.set(target, prop, value, receiver);
       if (isShouldTigger) {
         const triggerType = getTriggerType(target, prop);
         trigger(target, prop, triggerType);
       }
 
-      return res;
+      return _res;
     },
     ownKeys(target) {
       //用于处理for in的情况
@@ -60,7 +60,6 @@ export const createReactive = <T extends object>(
       return deleteRes;
     },
   });
-  return res;
 };
 
 export const shallowReactive = <T extends object>(data: T) => {
@@ -78,20 +77,30 @@ export const shallowReadOnly = <T extends object>(data: T) => {
   return createReactive(data, { isShallow: true, isReadOnly: true });
 };
 
-const getTriggerType = (object: Object, key: string | symbol) => {
+const getTriggerType = <T>(
+  object: T extends object & { length?: number } ? T : never,
+  key: string | symbol
+) => {
+  if (Array.isArray(object)) {
+    return Number(key) < Number(object?.length)
+      ? //* 数组修改某一项
+        TRIGGER_TYPE.SET_KEY
+      : //* 数组增加某一项
+        TRIGGER_TYPE.ADD_ARRAY_LENGTH;
+  }
   if (Object.prototype.hasOwnProperty.call(object, key)) {
     return TRIGGER_TYPE.SET_KEY;
   }
   return TRIGGER_TYPE.ADD_KEY;
 };
 
-const shouldTigger = <T extends object>(
-  target: T,
+const shouldTigger = (
+  target: object,
   prop: string | symbol,
   value: any,
   receiver: any
 ) => {
-  const oldValue = target[prop] as any;
+  const oldValue = target[prop as keyof typeof target] as any;
   if (oldValue === value) return false;
   /**
    * 结合get中的RAW使用

@@ -16,6 +16,8 @@ export enum TRIGGER_TYPE {
   ADD_KEY = "ADD_KEY",
   SET_KEY = "SET_KEY",
   DELETE_KEY = "DELETE_KEY",
+  ADD_ARRAY_LENGTH = "ADD_ARRAY_LENGTH",
+  // DELETE_ARRAY_LENGTH = "DELETE_ARRAY_LENGTH",
 }
 
 /**
@@ -69,6 +71,13 @@ export const trigger = <T extends Object>(
       effectsToRun.add(effect);
     });
   }
+  if (type === TRIGGER_TYPE.ADD_ARRAY_LENGTH) {
+    const lengthKeyEffects = keyToEffects.get("length") ?? [];
+    lengthKeyEffects.forEach((effect) => {
+      effectsToRun.add(effect);
+    });
+  }
+
   [...effectsToRun].forEach((effect) => {
     /**
      * ! 当在effect中对同一个变量进行 读取和设置时，会进行无限递归
