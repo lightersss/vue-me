@@ -8,10 +8,10 @@ type reactiveOptions = {
   isShallow?: boolean;
   isReadOnly?: boolean;
 };
-export const createReactive = (
-  data: object,
+export const createReactive = <T extends object>(
+  data: T,
   options?: reactiveOptions
-): any => {
+): T => {
   const { isShallow = false, isReadOnly = false } = options ?? {};
   return new Proxy(data, {
     get(target, prop, receiver) {
@@ -41,7 +41,7 @@ export const createReactive = (
       const isShouldTigger = shouldTigger(target, prop, value, receiver);
       const _res = Reflect.set(target, prop, value, receiver);
       if (isShouldTigger) {
-        const triggerType = getTriggerType(target, prop);
+        const triggerType = getTriggerType(target as object, prop);
         trigger(target, prop, triggerType);
       }
 

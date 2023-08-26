@@ -1,4 +1,5 @@
 import { effect } from "./effect";
+import ref, { toRefs } from "./ref";
 import {
   reactive,
   shallowReactive,
@@ -6,4 +7,12 @@ import {
   shallowReadOnly,
 } from "./reactive";
 
-export { effect, reactive, shallowReactive, readOnly, shallowReadOnly };
+export {
+  effect,
+  reactive,
+  shallowReactive,
+  readOnly,
+  shallowReadOnly,
+  ref,
+  toRefs,
+};
