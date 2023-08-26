@@ -2,6 +2,8 @@ import { TRACK_KEYS } from "./reactive";
 
 let activeEffect: null | EffectFn = null;
 /**
+ * @deprecated
+ * !改为使用 dataToEffects
  * * 此变量与cleanUp函数结合使用
  * * 在track时，会把副作用函数收集到某个Set中（对应track函数中的effects）
  * * 此变量保存了 副作用函数 和 Set 的关系，即哪些Set中包含了这个副作用函数
@@ -58,7 +60,7 @@ export const track = (data: Object, key: ObjectKeyType) => {
 export const trigger = <T extends Object>(
   data: T,
   key: ObjectKeyType,
-  type: TRIGGER_TYPE
+  type?: TRIGGER_TYPE
 ) => {
   let keyToEffects = dataToEffects.get(data);
   if (!keyToEffects) return;
@@ -66,12 +68,14 @@ export const trigger = <T extends Object>(
   if (!effects) return;
   let effectsToRun = new Set(effects);
   if (type === TRIGGER_TYPE.ADD_KEY || type === TRIGGER_TYPE.DELETE_KEY) {
+    //取出ownKey相关的effectFn，因为有键新增或删除了
     const iterateKeyEffects = keyToEffects.get(TRACK_KEYS.ITERATE_KEY) ?? [];
     iterateKeyEffects.forEach((effect) => {
       effectsToRun.add(effect);
     });
   }
   if (type === TRIGGER_TYPE.ADD_ARRAY_LENGTH) {
+    //取出length相关的effectFn，因为数组的长度变了
     const lengthKeyEffects = keyToEffects.get("length") ?? [];
     lengthKeyEffects.forEach((effect) => {
       effectsToRun.add(effect);
@@ -170,7 +174,7 @@ export const effect = <T>(fn: () => T, options?: EffectOptions) => {
     ...options,
   });
   // if (options?.scheduler) {
-  //   //todo:为什么书里要放在trigger函数里执行 ？ vue源码也是这么做的
+  //   //todo & fixme:为什么书里要放在trigger函数里执行 ？ vue源码也是这么做的
   //   options.scheduler(effectFn.runner);
   //   return;
   // }

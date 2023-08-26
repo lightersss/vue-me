@@ -1,7 +1,7 @@
 import { effect, track, trigger } from "./effect";
 
-export function computed(getter: () => any): any {
-  let prevValue: any;
+export function computed<T>(getter: () => T): { value: T } {
+  let prevValue: T;
   let outDate = true;
 
   const effecFn = effect(getter, {

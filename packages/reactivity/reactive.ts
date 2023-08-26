@@ -97,10 +97,10 @@ const getTriggerType = <T>(
 const shouldTigger = (
   target: object,
   prop: string | symbol,
-  value: any,
+  value: unknown,
   receiver: any
 ) => {
-  const oldValue = target[prop as keyof typeof target] as any;
+  const oldValue = target[prop as keyof typeof target];
   if (oldValue === value) return false;
   /**
    * 结合get中的RAW使用
