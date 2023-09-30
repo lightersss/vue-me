@@ -2,10 +2,11 @@
   "mode": "pre",
   "tag": "basic",
   "initialVersions": {
-    "reactivity": "1.0.1",
-    "render": "1.0.1"
+    "reactivity": "2.0.0-basic.1",
+    "render": "1.0.2-basic.0"
   },
   "changesets": [
+    "fast-mirrors-grow",
     "few-falcons-refuse",
     "violet-tigers-fail"
   ]

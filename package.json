@@ -11,7 +11,8 @@
   "devDependencies": {
     "reactivity": "1.0.0",
     "typescript": "^5.0.2",
-    "vite": "^4.3.9"
+    "vite": "^4.3.9",
+    "vitest": "^0.34.6"
   },
   "dependencies": {
     "@changesets/cli": "^2.26.2"
