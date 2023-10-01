@@ -13,6 +13,7 @@
 // proxy.obj.c = 5;
 // console.log(proxy);
 import { ref, effect, reactive } from "reactivity";
+
 const a = ref(2);
 const b = reactive({
   a: 1,
