@@ -9,7 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "reactivity": "1.0.0",
+    "reactivity": "workspace:*",
+    "render": "workspace:*",
     "typescript": "^5.0.2",
     "vite": "^4.3.9",
     "vitest": "^0.34.6"

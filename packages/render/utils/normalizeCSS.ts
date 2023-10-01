@@ -1,9 +1,4 @@
-export default function normalizeClassNames(
-  classNames:
-    | string
-    | Record<string, boolean>
-    | (string | Record<string, boolean>)[]
-) {
+export default function normalizeClassNames(classNames: any): string {
   if (typeof classNames === "string") return classNames;
   if (Array.isArray(classNames)) {
     return classNames
@@ -15,5 +10,3 @@ export default function normalizeClassNames(
     .map(([className]) => className)
     .join(" ");
 }
-
-console.log(normalizeClassNames("a b v"));

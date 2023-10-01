@@ -1,5 +1,5 @@
 import { createReactive } from "./reactive";
-const ref = (value: string | number | boolean) => {
+const ref = <T>(value: T) => {
   const obj = {
     value,
   };

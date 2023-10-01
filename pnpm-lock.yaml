@@ -13,8 +13,11 @@ importers:
         version: 2.26.2
     devDependencies:
       reactivity:
-        specifier: 1.0.0
-        version: registry.npmmirror.com/reactivity@1.0.0
+        specifier: workspace:*
+        version: link:packages/reactivity
+      render:
+        specifier: workspace:*
+        version: link:packages/render
       typescript:
         specifier: ^5.0.2
         version: 5.0.2
@@ -2502,12 +2505,6 @@ packages:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/react-is/-/react-is-18.2.0.tgz}
     name: react-is
     version: 18.2.0
-    dev: true
-
-  registry.npmmirror.com/reactivity@1.0.0:
-    resolution: {integrity: sha512-2wgWiW0ukWKdGYmLizjvH1hCtNVd+QDleTB8dERDsrpi693mAXNt6sPyftYX5de/VjYw4WZ19zh0JxHu8puhag==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/reactivity/-/reactivity-1.0.0.tgz}
-    name: reactivity
-    version: 1.0.0
     dev: true
 
   registry.npmmirror.com/rollup@3.25.1:
