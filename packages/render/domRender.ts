@@ -1,4 +1,4 @@
-import { createRender } from "render";
+import { createRender, specialVNodeType } from "render";
 import normalizeClassNames from "./utils/normalizeCSS";
 export const { render } = createRender<Element, Text, Comment>({
   createElement(vNode) {
@@ -49,8 +49,14 @@ export const { render } = createRender<Element, Text, Comment>({
     //!设置的属性在DOM属性上并不存在 设置为HTML属性
     el.setAttribute(prop, String(value));
   },
-  removeElement(vNode) {
-    vNode.el?.parentNode?.removeChild(vNode?.el);
+  removeElement: function removeElement(vNode) {
+    if (vNode.type === "FRAGMENT") {
+      vNode.children?.forEach((c) => {
+        removeElement(c);
+      });
+      return;
+    }
+    (vNode as any).el?.parentNode?.removeChild((vNode as any)?.el);
   },
   createTextNode: function (text: string) {
     return document.createTextNode(text);
